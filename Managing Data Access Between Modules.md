@@ -12,25 +12,62 @@ If there are two services such that A depends on B for a read operation... 
   
 - #1 and they are in the same module...  
 	- #1.1 and they are deployed in a single application...  
-		- #1.1.1 and A requires simple data operations over B's data: A should directly use B. 
-		- #1.1.2 and A requires complex data operations[^cdo] over B's data: A should use B's entity through defining a database relationship.  
+		- [r-1-1-1](#r-1-1-1) and A requires simple data operations over B's data: A should directly use B. 
+		- [r-1-1-2](#r-1-1-2) and A requires complex data operations[^cdo] over B's data: A should use B's entity through defining a database relationship.  
 	- #1.2 and they are deployed in seperate applications or they are developed by two different teams...  
-		- #1.2.1 and A requires simple data operations over B's data: B should be put in a common BusinessLogicLayer then A should directly use B itself.  
-		- #1.2.2 and A requires complex data operations over B's data: A's and B's entities should be put in a common DataAccessLayer then A should use B's entity through defining a database relationship.  
+		- [r-1-2-1](#r-1-2-1) and A requires simple data operations over B's data: B should be put in a common BusinessLogicLayer then A should directly use B itself.  
+		- [r-1-2-2](#r-1-2-2) and A requires complex data operations over B's data: A's and B's entities should be put in a common DataAccessLayer then A should use B's entity through defining a database relationship.  
 - #2 and they are in different modules... 
 	- #2.1 and A requires simple data operations over B's data...  
 		- #2.1.1 and they are deployed in a single application...  
-			- #2.1.1.1 and B is a vendor service[^vs] and can be changed in the future: A should define BFacadeInterface[^fcd] which by default implemented by using B itself.   
-			- #2.1.1.2 and B is a owned service[^os] : A should use B through BInterface which is defined by B.  
+			- [r-2-1-1-1](#r-2-1-1-1) and B is owned by a 3rd party and can be changed in the future: A should define BFacadeInterface[^fcd] which by default implemented by using B itself.   
+			- [r-2-1-1-2](#r-2-1-1-2) and B is owned by your organization: A should use B through BInterface which is defined by B.  
 		- #2.1.2 and they are deployed in seperate applications...   
-			- #2.1.2.1 and B is a vendor service and can be changed in the future: A should define BFacadeInterface which by default implemented by using BHttpClient to access B's REST endpoints.   
-			- #2.1.2.2 and B is a owned service: A should use BHttpClient through BHttpClientInterface.   
+			- [r-2-1-2-1](#r-2-1-2-1) and B is owned by a 3rd party and can be changed in the future: A should define BFacadeInterface which by default implemented by using BHttpClient to access B's REST endpoints.   
+			- [r-2-1-2-2](#r-2-1-2-2) and B is owned by your organization: A should use BHttpClient through BHttpClientInterface.   
 	- #2.2 and A requires a complex data operations over B's data...  
-		- [[#2.2.1-R]] and consistency is crucial: A's owner module should define a view which then reads from the B's database tables by the access writes given by B.  
-		- #2.2.2 and availability and performance is crucial... 
-			-  #2.2.2.1 and B is a vendor service and can be changed in the future: A should copy data from B in a different format optimized for its own use case using BEventConsumerClientInterface.   
-			-  #2.2.2.2 and B is a owned service: A should copy data from B in a different format optimized for its own use case using BEventConsumerClient.   
-  
+		- [r-2-2-1](#r-2-2-1) and consistency is crucial: A's owner module should define a view which then reads from the B's database tables by the access writes given by B.  
+		- r-2-2-2 and availability and performance is crucial... 
+			-  [r-2-2-2-1](#r-2-2-2-1) and B is owned by a 3rd party and can be changed in the future: A should copy data from B in a different format optimized for its own use case using BEventConsumerClientInterface.   #r2-2-21
+			-  [r-2-2-2-2](#r-2-2-2-2) and B is owned by your organization: A should copy data from B in a different format optimized for its own use case using BEventConsumerClient.   
+ ---
+
+|Module|Deployment|Complexity|3rd Party|Decision|  
+|---|---|---|---|---|  
+|same|single|simple|no|[r-1-1-1](#r-1-1-1)|
+|same|single|complex|no|[r-1-1-2](#r-1-1-2)|
+|same|seperate|simple|no|[r-1-2-1](#r-1-2-1)|
+|same|seperate|complex|no|[r-1-2-2](#r-1-2-2)|
+
+|different|single|both|yes|[r-2-1-1-1](#r-2-1-1-1)|
+|different|single|both|no|[r-2-1-1-2](#r-2-1-1-2)|
+|different|seperate|simple|no|[r-1-2-1](#r-1-2-1)|
+|different|seperate|complex|no|[r-1-2-2](#r-1-2-2)|
+
+
+### r-1-1-1
+A should directly use B.
+
+---
+### r-1-1-2
+A should use B's entity through defining a database relationship.
+
+---
+### r-1-2-1
+B should be put in a common BusinessLogicLayer then A should directly use B itself.
+
+---
+### r-1-2-2
+A's and B's entities should be put in a common DataAccessLayer then A should use B's entity through defining a database relationship.  
+
+---
+
+### r-2-2-1
+A should define the view not B because:
+- It's not possible for B to define views in it's own schema that will fulfill everybodies needs. So A is going to under or overfetch some data.
+- That will lead to a case where A wants to integrate with other 3rd party service but it can not know which fields of the view it should fill in order to work correctly.  
+ 
+ 
 ### Decision Tree For Write Operations   
   
 If there are two services such that A depends on B for a write operation...   
@@ -40,31 +77,21 @@ If there are two services such that A depends on B for a write operation... 
 	- #1.2 and they are deployed in seperate applications or they are developed by two different teams: B should be put in a common BusinessLogicLayer then A should directly use B itself.  
 - #2 and they are in different modules...  
 	- #2.1 and they are deployed in a single application...  
-		- #2.1.1 and B is a vendor service and can be changed in the future:  A should define BFacadeInterface which by default implemented by using B itself.  
-		- #2.1.2 and B is a owned service: A should use B through BInterface which is defined by B's owner.  
+		- #2.1.1 and B is owned by a 3rd party and can be changed in the future:  A should define BFacadeInterface which by default implemented by using B itself.  
+		- #2.1.2 and B is owned by your organization: A should use B through BInterface which is defined by B's owner.  
 	- #2.2 and they are deployed in seperate applications...  
 		- #2.2.1 and A requires simple data operations over B's data...  
-			- #2.2.1.1 and B is a vendor service and can be changed in the future: A should define BFacadeInterface which by default implemented by using BHttpClient to access B's REST endpoints.   
-			- #2.2.1.2 and B is a owned service: A should use BHttpClient through BHttpClientInterface.   
+			- #2.2.1.1 and B  is owned by a 3rd party and can be changed in the future: A should define BFacadeInterface which by default implemented by using BHttpClient to access B's REST endpoints.   
+			- #2.2.1.2 and B is owned by your organization: A should use BHttpClient through BHttpClientInterface.   
 		-  #2.2.2 and A requires long running data operations over B's data:  
-			- #2.2.2.1 and B is a vendor service and can be changed in the future: A should define BFacadeInterface which by default implemented by using BEventProducerClient.   
-			- #2.2.2.2 and B is a owned service: A should use BEventProducerClientInterface which by default implemented by using an event/queue bus producer to send  BEvent defined by B's owner.   
+			- #2.2.2.1 and B  is owned by a 3rd party and can be changed in the future: A should define BFacadeInterface which by default implemented by using BEventProducerClient.   
+			- #2.2.2.2 and B is owned by your organization: A should use BEventProducerClientInterface which by default implemented by using an event/queue bus producer to send  BEvent defined by B's owner.   
   
-[^cdo]: complex data operation: batch processing, ordering/filtering after join, db row locking etc.   
+[^cdo]: complex data operation: batch processing, ordering/filtering after join, db row locking etc.  
   
-[^vs]: vendor service a service that can be designed, modified, versioned without your control   
-  
-[^fcd]: purpose of a facade is to abstract a third party service so it is easier to replace.   
-  
-[^os]: owned service is a service that can't be designed, modified, or versioned without your control.   
-  
-[^cdw]: complex data write: IO intensive, CPU intensive, Network intensive   
+[^fcd]: purpose of a facade is to abstract a third party service so it is easier to replace. 
 
 
-### 2.2.1-R
-A should define the view not B because:
-- It's not possible for B to define views in it's own schema that will fulfill everybodies needs. So A is going to under or overfetch some data.
-- That will lead to a case where A wants to integrate with other vendor service but it can not know which fields of the view it should fill in order to work correctly.  
   
 ### Should read and write services be seperated (CQRS)?   
   
