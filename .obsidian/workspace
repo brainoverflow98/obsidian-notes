@@ -1,0 +1,94 @@
+{
+  "main": {
+    "id": "64f598e1ed91b28a",
+    "type": "split",
+    "children": [
+      {
+        "id": "46f38170ef5ea985",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Managing Data Access Between Modules.md",
+            "mode": "preview"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "58f58e658067f5c6",
+    "type": "split",
+    "children": [
+      {
+        "id": "935c2e1e7f83fb7c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e8cd21caf07da590",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "581368af6967e772",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "99b4f5e6a09b0b26",
+    "type": "split",
+    "children": [
+      {
+        "id": "8d63cd883e7a3520",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ea8481b4445cedc8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Managing Data Access Between Modules.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "46f38170ef5ea985",
+  "lastOpenFiles": [
+    "Managing Data Access Between Modules.md",
+    "TEST.md"
+  ]
+}
